@@ -23,30 +23,46 @@ import java.util.logging.Logger;
  */
 public class LeArquivo {
 
-    private static final String ESPACO = " ";       //#define do c
+    private static final String ESPACE = " ";       //#define do c
+    private static Calendar calendar = Calendar.getInstance();
 
     /**
      * Lê o arquivo e faz a transformações necessárias, armazenado-as no
      * stringbuilder
      *
-     * @param nomearquivo Noem do arquivo a ser lido
+     * @param fileName Noem do arquivo a ser lido
      * @return stringbuilder já tudo OK.
      */
-    public StringBuilder leitura(String nomearquivo) throws ParseException {
+    public StringBuilder leitura(String fileName) throws ParseException {
         StringBuilder sb = new StringBuilder();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(nomearquivo));
-            String linha = br.readLine();
-            int espaco = linha.indexOf(ESPACO);
 
-            String nomeServidor = linha.substring(0, espaco);   //O nome deo servidor é sempre o mesmo para cada arquivo
-	    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	    Calendar data = Calendar.getInstance();
-	    data.setTime(sdf.parse(validadata(linha.substring(espaco + 1))));
-	    
-            linha = br.readLine();                              //Le a nova linha
-            while (linha != null) {
-                if (!linha.startsWith("procs") && !linha.startsWith(" r")) {      //Estas linhas sempre devem ser ignoradas
+        try {
+            BufferedReader buffer = new BufferedReader(new FileReader(fileName));
+
+            String line = buffer.readLine();
+            int count = 1;
+            while (line != null) {
+                int espace = line.indexOf(ESPACE);
+                String serverName = line.substring(0, espace);
+                
+                Date dateTime = getDate(line.substring(9, 28), "yyyy-MM-dd HH:mm:ss");
+                
+                calendar.setTime(dateTime);
+
+                int day = getDay();
+                int month = getMonth();
+                int year = getYear();
+                String time = getTime(dateTime, "HH:mm:ss");
+
+                if (count == 60) {
+                    //soma os totais de max e média.
+                    //adiciona no buffer a linha resultante.
+                    
+                    count  = 1;
+                }
+                
+                line = buffer.readLine();
+                /* if (!linha.startsWith("procs") && !linha.startsWith(" r")) {      //Estas linhas sempre devem ser ignoradas
                     if (linha.startsWith(nomeServidor)) {
                         data.setTime(sdf.parse(validadata(linha.substring(linha.indexOf(ESPACO) + 1))));
                     } else {
@@ -54,7 +70,8 @@ public class LeArquivo {
 			data.add(Calendar.SECOND, 15);
                     }
                 }
-                linha = br.readLine();  //Le a proxima linha
+                linha = buffer.readLine();  //Le a proxima linha
+                 */
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
@@ -65,21 +82,28 @@ public class LeArquivo {
         return sb;
     }
 
-    /**
-     * Para verifiar se realmente é um data
-     *
-     * @param dia o dia lido do arquivo
-     * @return String novamente, mas validada pois realmente é uma data Acho que
-     * não precisa retransformar em String, mas ssim funcionou
-     */
-    private String validadata(String data) {
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date resultado = null;
-        try {
-            resultado = df.parse(data);      //valida a data e transforma o tipo para data
-        } catch (ParseException ex) {
-            Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return df.format(resultado);            //Retorna a data já transformada em string novamente
+    private Date getDate(String dateString, String format) throws ParseException {
+        DateFormat dateFormat = new SimpleDateFormat(format);
+        Date date = dateFormat.parse(dateString);
+
+        return date;
+    }
+
+    private String getTime(Date dateTime, String format) throws ParseException {
+        DateFormat dateFormat = new SimpleDateFormat(format);
+
+        return dateFormat.format(dateTime);
+    }
+
+    private int getDay() {
+        return calendar.get(Calendar.DAY_OF_MONTH);
+    }
+    
+    private int getMonth() {
+        return calendar.get(Calendar.MONTH) + 1; // janary start with 0
+    }
+    
+    private int getYear() {
+        return calendar.get(Calendar.YEAR);
     }
 }
