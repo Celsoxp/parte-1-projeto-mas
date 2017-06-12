@@ -45,59 +45,54 @@ public class LeArquivo {
             int count = 0;
             int max = 0;
             double avg = 0;
-            
+            boolean setFirstTime = false;
+            Date dateTime;
+            String time;
+
             int[] r = new int[60];
             int[] cpu = new int[60];
             int[] swp = new int[60];
             int[] free = new int[60];
             int[] bff = new int[60];
             int[] cache = new int[60];
-            
+
+            dateTime = getDate(line.substring(9, 28), "yyyy-MM-dd HH:mm:ss");
+            calendar.setTime(dateTime);
+            time = getTime(dateTime, "HH:mm:ss");
+
             while (line != null) {
                 int space = line.indexOf(SPACE);
                 String serverName = line.substring(0, space);
-                
-                Date dateTime = getDate(line.substring(9, 28), "yyyy-MM-dd HH:mm:ss");
-                
-                calendar.setTime(dateTime);
 
-                int day = getDay();
-                int month = getMonth();
-                int year = getYear();
-                String time = getTime(dateTime, "HH:mm:ss");
-                
-                r[count] = Integer.parseInt(line.substring(29, space));
-                swp[count] = Integer.parseInt(line.substring(37,space));
-                free[count] = Integer.parseInt(line.substring(42, space));
-                bff[count] = Integer.parseInt(line.substring(50, space));
-                cache[count] = Integer.parseInt(line.substring(57, space));
-                cpu[count] = 100 - (Integer.parseInt(line.substring(102, space)));
-                
+                r[count] = Integer.parseInt(line.substring(29, 30));
+                swp[count] = Integer.parseInt(line.substring(36, 40));
+                free[count] = Integer.parseInt(line.substring(41, 48));
+                bff[count] = Integer.parseInt(line.substring(49, 55));
+                cache[count] = Integer.parseInt(line.substring(56, 62));
+                cpu[count] = 100 - (Integer.parseInt(line.substring(101, 103)));
+
                 if (count == 59) {
-                    
                     sb.append(serverName).append(SPACE);
-                    
-                    max = getMax(r);
-                    avg = getAvg(r);
-                    
-                    
-                    //soma os totais de max e média.
-                    //adiciona no buffer a linha resultante.
-                    
-                    count  = 1;
-                }
-                
-                line = buffer.readLine();
-                /* if (!linha.startsWith("procs") && !linha.startsWith(" r")) {      //Estas linhas sempre devem ser ignoradas
-                    if (linha.startsWith(nomeServidor)) {
-                        data.setTime(sdf.parse(validadata(linha.substring(linha.indexOf(ESPACO) + 1))));
+
+                    if (!setFirstTime) {
+                        setFirstTime = true;
                     } else {
-                        sb.append(nomeServidor).append(" ").append(sdf.format(data.getTime())).append(linha).append("\n");
-			data.add(Calendar.SECOND, 15);
+                        calendar.add(Calendar.MINUTE, 15);
                     }
+                    
+                    sb.append(dateTime).append(SPACE);
+                    sb.append(getDay()).append(SPACE).append(getMonth()).append(SPACE).append(getYear());
+                    sb.append(getMax(r)).append(SPACE).append(getAvg(r)).append(SPACE);
+                    sb.append(getMax(cpu)).append(SPACE).append(getAvg(cpu)).append(SPACE);
+                    sb.append(getMax(swp)).append(SPACE).append(getAvg(swp)).append(SPACE);
+                    sb.append(getMax(free)).append(SPACE).append(getAvg(free)).append(SPACE);
+                    sb.append(getMax(bff)).append(SPACE).append(getAvg(bff)).append(SPACE);
+                    sb.append(getMax(cache)).append(SPACE).append(getAvg(cache)).append(SPACE);
+
+                    count = 1;
                 }
-                linha = buffer.readLine();  //Le a proxima linha
-                 */
+
+                line = buffer.readLine();
             }
         } catch (FileNotFoundException ex) {
             Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
@@ -124,26 +119,26 @@ public class LeArquivo {
     private int getDay() {
         return calendar.get(Calendar.DAY_OF_MONTH);
     }
-    
+
     private int getMonth() {
         return calendar.get(Calendar.MONTH) + 1; // janary start with 0
     }
-    
+
     private int getYear() {
         return calendar.get(Calendar.YEAR);
     }
-    
+
     private int getMax(int[] array) {
         return Arrays.stream(array).max().getAsInt();
     }
-    
+
     private double getAvg(int[] array) {
         double total = 0;
-        
+
         for (int i = 0; i < array.length; i++) {
             total += array[i];
         }
-        
-        return total/array.length;
+
+        return total / array.length;
     }
 }
