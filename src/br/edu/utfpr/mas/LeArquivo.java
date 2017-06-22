@@ -91,7 +91,9 @@ public class LeArquivo {
 
                     count = 1;
                 }
-
+                
+                sb.append("\n");
+                
                 line = buffer.readLine();
             }
         } catch (FileNotFoundException ex) {
