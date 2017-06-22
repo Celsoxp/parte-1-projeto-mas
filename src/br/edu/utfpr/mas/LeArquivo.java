@@ -47,7 +47,7 @@ public class LeArquivo {
             double avg = 0;
             boolean setFirstTime = false;
             Date dateTime;
-            String time;
+            String time, strDateTime = "";
 
             int[] r = new int[60];
             int[] cpu = new int[60];
@@ -57,9 +57,10 @@ public class LeArquivo {
             int[] cache = new int[60];
 
             dateTime = getDate(line.substring(9, 28), "yyyy-MM-dd HH:mm:ss");
-            calendar.setTime(dateTime);
+            this.calendar.setTime(dateTime);
             time = getTime(dateTime, "HH:mm:ss");
-
+            strDateTime = getTime(dateTime, "yyyy-MM-dd HH:mm:ss");
+            
             while (line != null) {
                 int space = line.indexOf(SPACE);
                 String serverName = line.substring(0, space);
@@ -77,23 +78,58 @@ public class LeArquivo {
                     if (!setFirstTime) {
                         setFirstTime = true;
                     } else {
-                        calendar.add(Calendar.MINUTE, 15);
+                        this.calendar.add(Calendar.MINUTE, 15);
+                        
+                        strDateTime = getTime(this.calendar.getTime(), "yyyy-MM-dd HH:mm:ss");
+                        
+                        
                     }
                     
-                    sb.append(dateTime).append(SPACE);
-                    sb.append(getDay()).append(SPACE).append(getMonth()).append(SPACE).append(getYear());
-                    sb.append(getMax(r)).append(SPACE).append(getAvg(r)).append(SPACE);
-                    sb.append(getMax(cpu)).append(SPACE).append(getAvg(cpu)).append(SPACE);
-                    sb.append(getMax(swp)).append(SPACE).append(getAvg(swp)).append(SPACE);
-                    sb.append(getMax(free)).append(SPACE).append(getAvg(free)).append(SPACE);
-                    sb.append(getMax(bff)).append(SPACE).append(getAvg(bff)).append(SPACE);
-                    sb.append(getMax(cache)).append(SPACE).append(getAvg(cache)).append(SPACE);
-
+                    sb.append(strDateTime)
+                      .append(SPACE);
+                    
+                    sb.append(getDay())
+                      .append(SPACE)
+                      .append(getMonth())
+                      .append(SPACE)
+                      .append(getYear())
+                      .append(SPACE);
+                              
+                    sb.append(formatDouble(getMax(r)))
+                      .append(SPACE)
+                      .append(formatDouble(getAvg(r)))
+                      .append(SPACE);
+                    
+                    sb.append(formatDouble(getMax(cpu)))
+                      .append(SPACE)
+                      .append(formatDouble(getAvg(cpu)))
+                      .append(SPACE);
+                    
+                    sb.append(formatDouble(getMax(swp)))
+                      .append(SPACE)
+                      .append(formatDouble(getAvg(swp)))
+                      .append(SPACE);
+                    
+                    sb.append(formatDouble(getMax(free)))
+                      .append(SPACE)
+                      .append(formatDouble(getAvg(free)))
+                      .append(SPACE);
+                    
+                    sb.append(formatDouble(getMax(bff)))
+                      .append(SPACE)
+                      .append(formatDouble(getAvg(bff)))
+                      .append(SPACE);
+                    
+                    sb.append(formatDouble(getMax(cache)))
+                      .append(SPACE)
+                      .append(formatDouble(getAvg(cache)))
+                      .append(SPACE)
+                      .append("\n");
+                    
                     count = 1;
                 }
                 
-                sb.append("\n");
-                
+                count++;
                 line = buffer.readLine();
             }
         } catch (FileNotFoundException ex) {
@@ -101,7 +137,7 @@ public class LeArquivo {
         } catch (IOException ex) {
             Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //System.out.print(sb);
+        
         return sb;
     }
 
@@ -119,15 +155,15 @@ public class LeArquivo {
     }
 
     private int getDay() {
-        return calendar.get(Calendar.DAY_OF_MONTH);
+        return this.calendar.get(Calendar.DAY_OF_MONTH);
     }
 
     private int getMonth() {
-        return calendar.get(Calendar.MONTH) + 1; // janary start with 0
+        return this.calendar.get(Calendar.MONTH) + 1; // janary start with 0
     }
 
     private int getYear() {
-        return calendar.get(Calendar.YEAR);
+        return this.calendar.get(Calendar.YEAR);
     }
 
     private int getMax(int[] array) {
@@ -143,4 +179,10 @@ public class LeArquivo {
 
         return total / array.length;
     }
+    
+    private String formatDouble(double valor) {
+        
+        return String.format("%.2f", valor);
+    }
+
 }
