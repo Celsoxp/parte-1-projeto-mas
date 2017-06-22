@@ -81,8 +81,6 @@ public class LeArquivo {
                         this.calendar.add(Calendar.MINUTE, 15);
                         
                         strDateTime = getTime(this.calendar.getTime(), "yyyy-MM-dd HH:mm:ss");
-                        
-                        
                     }
                     
                     sb.append(strDateTime)
@@ -126,7 +124,7 @@ public class LeArquivo {
                       .append(SPACE)
                       .append("\n");
                     
-                    count = 1;
+                    count = 0;
                 }
                 
                 count++;
