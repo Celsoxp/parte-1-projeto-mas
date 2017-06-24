@@ -42,47 +42,47 @@ public class LeArquivo {
             BufferedReader buffer = new BufferedReader(new FileReader(fileName));
 
             String line = buffer.readLine();
-            int count = 0;
-            int max = 0;
-            double avg = 0;
+            int count = 0, totalLinhas = 1;
             boolean setFirstTime = false;
             Date dateTime;
             String time, strDateTime = "";
 
-            int[] r = new int[60];
-            int[] cpu = new int[60];
-            int[] swp = new int[60];
-            int[] free = new int[60];
-            int[] bff = new int[60];
-            int[] cache = new int[60];
-
+            int[] r = new int[61];
+            int[] cpu = new int[61];
+            int[] swp = new int[61];
+            int[] free = new int[61];
+            int[] bff = new int[61];
+            int[] cache = new int[61];
+            
+            int space = line.indexOf(SPACE);
+            
+            String serverName = line.substring(0, space);
             dateTime = getDate(line.substring(9, 28), "yyyy-MM-dd HH:mm:ss");
             this.calendar.setTime(dateTime);
             time = getTime(dateTime, "HH:mm:ss");
             strDateTime = getTime(dateTime, "yyyy-MM-dd HH:mm:ss");
             
             while (line != null) {
-                int space = line.indexOf(SPACE);
-                String serverName = line.substring(0, space);
-
+                
                 r[count] = Integer.parseInt(line.substring(29, 30));
                 swp[count] = Integer.parseInt(line.substring(36, 40));
                 free[count] = Integer.parseInt(line.substring(41, 48));
                 bff[count] = Integer.parseInt(line.substring(49, 55));
                 cache[count] = Integer.parseInt(line.substring(56, 62));
-                cpu[count] = 100 - (Integer.parseInt(line.substring(101, 103)));
+                
+                String idCpu = line.substring(101, 104).trim();
+                cpu[count] = 100 - (Integer.parseInt(idCpu));
 
-                if (count == 59) {
+                if (count == 60) {
                     sb.append(serverName).append(SPACE);
 
                     if (!setFirstTime) {
                         setFirstTime = true;
+                        
                     } else {
                         this.calendar.add(Calendar.MINUTE, 15);
                         
                         strDateTime = getTime(this.calendar.getTime(), "yyyy-MM-dd HH:mm:ss");
-                        
-                        
                     }
                     
                     sb.append(strDateTime)
@@ -126,12 +126,27 @@ public class LeArquivo {
                       .append(SPACE)
                       .append("\n");
                     
-                    count = 1;
+                    count = 0;
+                    
+                    for (int i = 0; i < 61; i++) {
+                        r[i] = 0;
+                        swp[i] = 0;
+                        free[i] = 0;
+                        bff[i] = 0;
+                        cache[i] = 0;
+                        cpu[i] = 0;
+                    }
+                    
+                } else {
+                    count++;
+                    totalLinhas++;
                 }
                 
-                count++;
                 line = buffer.readLine();
             }
+            
+            System.out.println("Total de linhas lidas:" + totalLinhas);
+            
         } catch (FileNotFoundException ex) {
             Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
