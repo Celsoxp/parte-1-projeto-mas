@@ -127,7 +127,7 @@ public class LeArquivo {
                       .append("\n");
                     
                     count = 0;
-                    
+
                     for (int i = 0; i < 61; i++) {
                         r[i] = 0;
                         swp[i] = 0;
