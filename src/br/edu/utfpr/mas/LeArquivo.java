@@ -46,34 +46,68 @@ public class LeArquivo {
             boolean setFirstTime = false;
             Date dateTime;
             String time, strDateTime = "";
+            int interval = 0;
 
-            int[] r = new int[61];
-            int[] cpu = new int[61];
-            int[] swp = new int[61];
-            int[] free = new int[61];
-            int[] bff = new int[61];
-            int[] cache = new int[61];
+            int[] r = new int[60];
+            int[] cpu = new int[60];
+            int[] swp = new int[60];
+            int[] free = new int[60];
+            int[] bff = new int[60];
+            int[] cache = new int[60];
             
             int space = line.indexOf(SPACE);
             
+            // Cabeçalho
+            /*
+            sb.append("Servidor").append(SPACE);
+            sb.append("DateTime").append(SPACE);
+            sb.append("Dia").append(SPACE);
+            sb.append("Mês").append(SPACE);
+            sb.append("Ano").append(SPACE);
+            sb.append("MAX(r)").append(SPACE);
+            sb.append("MEDIA(r)").append(SPACE);
+            sb.append("MAX(cpu)").append(SPACE);
+            sb.append("MEDIA(cpu)").append(SPACE);
+            sb.append("MAX(swp)").append(SPACE);
+            sb.append("MEDIA(swp)").append(SPACE);
+            sb.append("MAX(free)").append(SPACE);
+            sb.append("MEDIA(free)").append(SPACE);
+            sb.append("MAX(bff)").append(SPACE);
+            sb.append("MEDIA(bff)").append(SPACE);
+            sb.append("MAX(cache)").append(SPACE);
+            sb.append("MEDIA(cache)").append(SPACE).append("\n");
+            */
             String serverName = line.substring(0, space);
             dateTime = getDate(line.substring(9, 28), "yyyy-MM-dd HH:mm:ss");
             this.calendar.setTime(dateTime);
             time = getTime(dateTime, "HH:mm:ss");
             strDateTime = getTime(dateTime, "yyyy-MM-dd HH:mm:ss");
             
-            while (line != null) {
+            int hour =  0;
+            int minute = 0;
+            int second = 0;
+            Date lineDate;
+            String lineTime;
+            int totalSecond = 0;
+            Calendar lineCalendar = Calendar.getInstance();
+            
+            interval =  900;
+            
+            while (true) {
                 
-                r[count] = Integer.parseInt(line.substring(29, 30));
-                swp[count] = Integer.parseInt(line.substring(36, 40));
-                free[count] = Integer.parseInt(line.substring(41, 48));
-                bff[count] = Integer.parseInt(line.substring(49, 55));
-                cache[count] = Integer.parseInt(line.substring(56, 62));
-                
-                String idCpu = line.substring(101, 104).trim();
-                cpu[count] = 100 - (Integer.parseInt(idCpu));
+                if (line != null) {
+                    lineDate = getDate(line.substring(9, 28), "yyyy-MM-dd HH:mm:ss");
+                    lineCalendar.setTime(lineDate);
+                    lineTime = getTime(lineDate, "HH:mm:ss");
 
-                if (count == 60) {
+                    hour =  lineCalendar.get(Calendar.HOUR_OF_DAY);
+                    minute = lineCalendar.get(Calendar.MINUTE);
+                    second = lineCalendar.get(Calendar.SECOND);
+
+                    totalSecond = hour * 3600 + minute * 60 + second;  
+                }
+                
+                if ( totalSecond > interval || line == null) {
                     sb.append(serverName).append(SPACE);
 
                     if (!setFirstTime) {
@@ -85,6 +119,7 @@ public class LeArquivo {
                         strDateTime = getTime(this.calendar.getTime(), "yyyy-MM-dd HH:mm:ss");
                     }
                     
+                    // Adiciona no buffer as informações lidas.
                     sb.append(strDateTime)
                       .append(SPACE);
                     
@@ -95,9 +130,9 @@ public class LeArquivo {
                       .append(getYear())
                       .append(SPACE);
                               
-                    sb.append(formatDouble(getMax(r)))
+                    sb.append(getMax(r))
                       .append(SPACE)
-                      .append(formatDouble(getAvg(r)))
+                      .append((int) getAvg(r))
                       .append(SPACE);
                     
                     sb.append(formatDouble(getMax(cpu)))
@@ -105,30 +140,36 @@ public class LeArquivo {
                       .append(formatDouble(getAvg(cpu)))
                       .append(SPACE);
                     
-                    sb.append(formatDouble(getMax(swp)))
+                    sb.append(getMax(swp))
                       .append(SPACE)
-                      .append(formatDouble(getAvg(swp)))
+                      .append((int) getAvg(swp))
                       .append(SPACE);
                     
-                    sb.append(formatDouble(getMax(free)))
+                    sb.append(getMax(free))
                       .append(SPACE)
-                      .append(formatDouble(getAvg(free)))
+                      .append((int) getAvg(free))
                       .append(SPACE);
                     
-                    sb.append(formatDouble(getMax(bff)))
+                    sb.append((int) getMax(bff))
                       .append(SPACE)
-                      .append(formatDouble(getAvg(bff)))
+                      .append((int) getAvg(bff))
                       .append(SPACE);
                     
-                    sb.append(formatDouble(getMax(cache)))
+                    sb.append((int) getMax(cache))
                       .append(SPACE)
-                      .append(formatDouble(getAvg(cache)))
+                      .append((int) getAvg(cache))
                       .append(SPACE)
                       .append("\n");
                     
                     count = 0;
-
-                    for (int i = 0; i < 61; i++) {
+                    
+                    
+                    if (line == null) {
+                        break;
+                    }
+                    
+                    // zera os vetores
+                    for (int i = 0; i < 60; i++) {
                         r[i] = 0;
                         swp[i] = 0;
                         free[i] = 0;
@@ -137,11 +178,25 @@ public class LeArquivo {
                         cpu[i] = 0;
                     }
                     
-                } else {
-                    count++;
-                    totalLinhas++;
+                    interval += 900;
                 }
                 
+                // Lendo as informações de ranquue, swap, memória.
+                r[count] = Integer.parseInt(line.substring(29, 30));
+                
+                swp[count] = Integer.parseInt(line.substring(36, 40));
+
+                free[count] = Integer.parseInt(line.substring(41, 48))/1024;
+
+                bff[count] = Integer.parseInt(line.substring(49, 55))/1024;
+
+                cache[count] = Integer.parseInt(line.substring(56, 62))/1024;
+
+                String idCpu = line.substring(101, 104).trim();
+                cpu[count] = 100 - (Integer.parseInt(idCpu));
+                count++;
+                
+                // Vai para a proxima linha
                 line = buffer.readLine();
             }
             
