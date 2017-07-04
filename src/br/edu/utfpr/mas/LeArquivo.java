@@ -50,7 +50,7 @@ public class LeArquivo {
                     if (linha.startsWith(nomeServidor)) {
                         data.setTime(sdf.parse(validadata(linha.substring(linha.indexOf(ESPACO) + 1))));
                     } else {
-                        sb.append(nomeServidor).append(" ").append(sdf.format(data.getTime())).append(linha).append("\n");
+                        sb.append(nomeServidor).append(ESPACO).append(sdf.format(data.getTime())).append(ESPACO).append(linha).append("\n");
 			data.add(Calendar.SECOND, 15);
                     }
                 }
