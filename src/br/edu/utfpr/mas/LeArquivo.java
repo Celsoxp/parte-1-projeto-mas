@@ -91,12 +91,13 @@ public class LeArquivo {
             String lineTime;
             int totalSecond = 0;
             Calendar lineCalendar = Calendar.getInstance();
-            
+            Scanner in = null;
             interval =  900;
             
             while (true) {
-		Scanner in = new Scanner(line).useDelimiter("[^0-9]+");
+		
                 if (line != null) {
+                    in = new Scanner(line).useDelimiter("[^0-9]+");
                     lineDate = getDate(line.substring(9, 28), "yyyy-MM-dd HH:mm:ss");
                     lineCalendar.setTime(lineDate);
                     lineTime = getTime(lineDate, "HH:mm:ss");
