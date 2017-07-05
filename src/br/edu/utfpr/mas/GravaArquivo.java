@@ -23,7 +23,7 @@ public class GravaArquivo {
      * @param sb A stirng a ser gravada
      */
     public void grava(String nomeArquivo, StringBuilder sb) {
-        nomeArquivo = nomeArquivo.concat(".f01");           //Concatena
+        nomeArquivo = nomeArquivo.concat(".f02");           //Concatena
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(nomeArquivo));
             bw.write(sb.toString());
