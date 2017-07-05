@@ -25,11 +25,11 @@ public class GravaArquivo {
     public void grava(Dados d, PreparedStatement pstm) {
         try {
 	    pstm.setString(1, d.getServidor());
-	    pstm.setDate(2, (Date) d.getData());
+	    pstm.setDate(2, d.getData());
 	    pstm.setTime(3, d.getTempo());
-	    pstm.setInt(4, d.getAno());
+	    pstm.setInt(4, d.getDia());
 	    pstm.setInt(5, d.getMes());
-	    pstm.setInt(6, d.getDia());
+	    pstm.setInt(6, d.getAno());
 	    pstm.setInt(7, d.getrMax());
 	    pstm.setInt(8, d.getrMedia());
 	    pstm.setFloat(9, d.getCpuMax());
@@ -44,7 +44,6 @@ public class GravaArquivo {
 	    pstm.setInt(18, d.getCacheMedia());
 	    
 	    pstm.execute();
-	    pstm.close();
         } catch (SQLException ex) {
 	    Logger.getLogger(GravaArquivo.class.getName()).log(Level.SEVERE, null, ex);
 	}

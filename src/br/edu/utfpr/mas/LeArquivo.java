@@ -38,32 +38,39 @@ public class LeArquivo {
      * @param fileName Noem do arquivo a ser lido
      * @return stringbuilder já tudo OK.
      */
-    public void leitura(String fileName, GravaArquivo g, ConexaoBD c) throws ParseException {
+    public void leitura(String fileName, GravaArquivo g, ConexaoBD c) throws ParseException, SQLException {
+        PreparedStatement  pstm=null;
         try {
             BufferedReader buffer = new BufferedReader(new FileReader(fileName));
             String line = buffer.readLine();
 	    int totalLinhas = 0;
 	    Dados  d = null;
 	    
+            Statement stmt = c.getStatement();
 	    String sql = "insert into Dados " +
-			 "(Servidor,Data,Tempo,Ano,Mes,Dia,rMax,rMedia,cpuMax,cpuMedia,swpMex,swpMedia,freeMax,freeMedia,bffMax,bffMedia,cacheMax,cacheMedia)" +
+			 "(NomeServidor,Data,Hora,Ano,Mes,Dia,rMax,rMedia,cpuMax,cpuMedia,swpMax,swpMedia,freeMax,freeMedia,bffMax,bffMedia,cacheMax,cacheMedia)" +
 			 " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";   
-            PreparedStatement  pstm= c.preparaStatement(sql);
+            pstm= c.preparaStatement(sql);
             
 	    int space = line.indexOf(SPACE);
             String serverName = line.substring(0, space);
 	   
-            Date lineDate;
+            java.sql.Date lineDate = null;
             Time lineTime;
             int totalSecond = 0;
             Calendar lineCalendar = Calendar.getInstance();
-
+            Scanner in = null;
             while (true) {
-		Scanner in = new Scanner(line).useDelimiter("[^0-9]+");
                 if (line != null) {
-                    lineDate = new GregorianCalendar(in.nextInt(), in.nextInt(), in.nextInt()).getTime();
+        //Tirar esssa linha para ler data corretamente lineDate = new java.sql.Date(new GregorianCalendar().getTimeInMillis());
+                    in = new Scanner(line).useDelimiter("[^0-9]+");
+                    in.nextInt();
+                    in.nextInt();
+                    in.nextInt();
 		    lineTime = new Time(in.nextInt(),in.nextInt(),in.nextInt());
 		    // Adiciona no buffer as informações lidas.
+                    line = line.substring(line.indexOf(" "));
+                    in = new Scanner(line.substring(20));
 		    d = new Dados(serverName, lineDate, lineTime, in.nextInt(), in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextFloat(),in.nextFloat(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt());
 		    g.grava(d, pstm);
 		}
@@ -82,7 +89,9 @@ public class LeArquivo {
 	    Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
 	} catch (SQLException ex) {
 	    Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
-	}
+	}finally{
+            pstm.close();
+        }
     }
 
     private Date getDate(String dateString, String format) throws ParseException {

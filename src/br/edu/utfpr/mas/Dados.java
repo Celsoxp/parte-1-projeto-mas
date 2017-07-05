@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class Dados {
     private String servidor;
-    private java.util.Date data;
+    private java.sql.Date data;
     private Time tempo;
     private int ano;
     private int mes;
@@ -30,7 +30,7 @@ public class Dados {
     private int cacheMax;
     private int cacheMedia;
  
-    public Dados(String servidor, java.util.Date data, Time tempo, int ano, int mes, int dia, int rMax, int rMedia, float cpuMax, float cpuMedia, int swpMax, int swpMedia, int freeMax, int freeMedia, int bffMax, int bffMedia, int cacheMax, int cacheMedia) {
+    public Dados(String servidor, java.sql.Date data, Time tempo, int ano, int mes, int dia, int rMax, int rMedia, float cpuMax, float cpuMedia, int swpMax, int swpMedia, int freeMax, int freeMedia, int bffMax, int bffMedia, int cacheMax, int cacheMedia) {
 	this.servidor = servidor;
 	this.tempo=tempo;
 	this.data = data;
@@ -61,7 +61,7 @@ public class Dados {
     /**
      * @return the data
      */
-    public java.util.Date getData() {
+    public java.sql.Date getData() {
 	return data;
     }   
     /**

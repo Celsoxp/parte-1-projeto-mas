@@ -65,9 +65,9 @@ public class ConexaoBD
     {
         try
         {   
-            String dbUrl = "jdbc:mysql://localhost:3306/mas";
+            String dbUrl = "jdbc:mysql://localhost:3306/logs";
             String user  = "root";
-            String senha = "senha";
+            String senha = "12345678";
 
              // obter conexao
                 conn = DriverManager.getConnection(dbUrl, user, senha);
