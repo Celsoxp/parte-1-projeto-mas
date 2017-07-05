@@ -5,6 +5,7 @@
  */
 package br.edu.utfpr.mas;
 
+import java.sql.SQLException;
 import java.text.ParseException;
 
 /**
@@ -17,21 +18,16 @@ public class Main {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, SQLException {
 
         LeArquivo leArquivo = new LeArquivo();
-        GravaArquivo gravaArquivo = new GravaArquivo();
+        GravaArquivo grava = new GravaArquivo();
+	ConexaoBD con = ConexaoBD.getInstance();
+	con.conectar();
         //String nomeArquivo = "./uncompress/yogafire_stats-20170327.txt";
         
         String nomeArquivo = args[0];                                           //Chama o arquivo da linha de comando
-        StringBuilder sb = leArquivo.leitura(nomeArquivo);                      //Para ler o aqruivo e criar o stringbuilder
-        
-        //nomeArquivo = nomeArquivo.substring(nomeArquivo.lastIndexOf("/") + 1);
-        //nomeArquivo = nomeArquivo.substring(0, nomeArquivo.indexOf("."));
-        
-        nomeArquivo = nomeArquivo.replace("uncompress", "renomeados");          //Caminho doo diretório + nome do arquivo
-        nomeArquivo = nomeArquivo.substring(0, nomeArquivo.lastIndexOf("."));   //Para remover a extensão
-        gravaArquivo.grava(nomeArquivo, sb);                                    //PAra gravar o arquivo
+        leArquivo.leitura(nomeArquivo, grava, con);                      //Para ler o aqruivo e criar o stringbuilder
     }
 
 }
