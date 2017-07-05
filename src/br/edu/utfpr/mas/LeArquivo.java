@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -94,7 +95,7 @@ public class LeArquivo {
             interval =  900;
             
             while (true) {
-                
+		Scanner in = new Scanner(line).useDelimiter("[^0-9]+");
                 if (line != null) {
                     lineDate = getDate(line.substring(9, 28), "yyyy-MM-dd HH:mm:ss");
                     lineCalendar.setTime(lineDate);
@@ -181,20 +182,32 @@ public class LeArquivo {
                     
                     interval += 900;
                 }
-                
+                in.nextInt();
+                in.nextInt();
+                in.nextInt();
+                in.nextInt();
+                in.nextInt();
+                in.nextInt();
                 // Lendo as informações de ranquue, swap, memória.
-                r[count] = Integer.parseInt(line.substring(29, 30));
+                r[count] = in.nextInt();
                 
-                swp[count] = Integer.parseInt(line.substring(36, 40));
+                in.nextInt();
+                swp[count] = in.nextInt();
 
-                free[count] = Integer.parseInt(line.substring(41, 48))/1024;
+                free[count] = in.nextInt()/1024;
 
-                bff[count] = Integer.parseInt(line.substring(49, 55))/1024;
+                bff[count] = in.nextInt()/1024;
 
-                cache[count] = Integer.parseInt(line.substring(56, 62))/1024;
-
-                String idCpu = line.substring(101, 104).trim();
-                cpu[count] = 100 - (Integer.parseInt(idCpu));
+                cache[count] = in.nextInt()/1024;
+		in.nextInt();
+		in.nextInt();
+		in.nextInt();
+		in.nextInt();
+		in.nextInt();
+		in.nextInt();
+		in.nextInt();
+		in.nextInt();
+                cpu[count] = 100 - in.nextInt();
                 count++;
                 
                 // Vai para a proxima linha
