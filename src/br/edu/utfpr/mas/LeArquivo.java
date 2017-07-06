@@ -9,15 +9,17 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Time;
+//import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,57 +41,111 @@ public class LeArquivo {
      * @return stringbuilder já tudo OK.
      */
     public void leitura(String fileName, GravaArquivo g, ConexaoBD c) throws ParseException, SQLException {
-        PreparedStatement  pstm=null;
+        PreparedStatement pstm = null;
         try {
             BufferedReader buffer = new BufferedReader(new FileReader(fileName));
             String line = buffer.readLine();
-	    int totalLinhas = 0;
-	    Dados  d = null;
-	    
-            Statement stmt = c.getStatement();
-	    String sql = "insert into Dados " +
-			 "(NomeServidor,Data,Hora,Ano,Mes,Dia,rMax,rMedia,cpuMax,cpuMedia,swpMax,swpMedia,freeMax,freeMedia,bffMax,bffMedia,cacheMax,cacheMedia)" +
-			 " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";   
-            pstm= c.preparaStatement(sql);
-            
-	    int space = line.indexOf(SPACE);
+            int totalLinhas = 0;
+            Dados d = null;
+
+            String sql = "insert into Dados "
+                    + "(NomeServidor,Data,Hora,Ano,Mes,Dia,rMax,rMedia,cpuMax,cpuMedia,swpMax,swpMedia,freeMax,freeMedia,bffMax,bffMedia,cacheMax,cacheMedia)"
+                    + " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            pstm = c.preparaStatement(sql);
+
+            int space = line.indexOf(SPACE);
             String serverName = line.substring(0, space);
-	   
-            java.sql.Date lineDate = null;
+
+            Date lineDate = null;
             Time lineTime;
             int totalSecond = 0;
             Calendar lineCalendar = Calendar.getInstance();
             Scanner in = null;
             while (true) {
                 if (line != null) {
-        //Tirar esssa linha para ler data corretamente lineDate = new java.sql.Date(new GregorianCalendar().getTimeInMillis());
+                    //Tirar esssa linha para ler data corretamente lineDate = new java.sql.Date(new GregorianCalendar().getTimeInMillis());
+                    line = line.substring(line.indexOf(" ") + 1);
+                    String strData = line.substring(0, line.indexOf(" "));
+                    lineDate = getDate(strData, "yyyy-MM-dd");
+
                     in = new Scanner(line).useDelimiter("[^0-9]+");
                     in.nextInt();
                     in.nextInt();
                     in.nextInt();
-		    lineTime = new Time(in.nextInt(),in.nextInt(),in.nextInt());
-		    // Adiciona no buffer as informações lidas.
-                    line = line.substring(line.indexOf(" "));
-                    in = new Scanner(line.substring(20));
-		    d = new Dados(serverName, lineDate, lineTime, in.nextInt(), in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextFloat(),in.nextFloat(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt(),in.nextInt());
-		    g.grava(d, pstm);
-		}
-		else {
-		    break;
-		}
+                    lineTime = new Time(in.nextInt(), in.nextInt(), in.nextInt());
+                    // Adiciona no buffer as informações lidas.
+                    line = line.substring(line.indexOf(" ") + 1);
+                    line = line.substring(line.indexOf(" ") + 1);
 
-		// Vai para a proxima linha
-		line = buffer.readLine();
-		totalLinhas++;
-		System.out.println("Total de linhas lidas:" + totalLinhas);
-	    }    
-	} catch (FileNotFoundException ex) {
-	    Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
-	} catch (IOException ex) {
-	    Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
-	} catch (SQLException ex) {
-	    Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
-	}finally{
+                    int dia = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int mes = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int ano = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int rMax = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int rMedia = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    float cpuMax = Float.parseFloat(
+                            line.substring(0, line.indexOf(" ")).replace(",", ".")
+                    );
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    float cpuMedia = Float.parseFloat(
+                            line.substring(0, line.indexOf(" ")).replace(",", ".")
+                    );
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int swpMax = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int swpMedia = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int freeMax = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int freeMedia = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int bffMax = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int bffMedia = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int cacheMax = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    int cacheMedia = Integer.valueOf(line.substring(0, line.indexOf(" ")));
+                    line = line.substring(line.indexOf(" ") + 1);
+                    
+                    d = new Dados(
+                            serverName, lineDate, lineTime, ano, mes, dia, rMax,
+                            rMedia, cpuMax, cpuMedia, swpMax, swpMedia, freeMax,
+                            freeMedia, bffMax, bffMedia, cacheMax, cacheMedia);
+
+                    g.grava(d, pstm);
+                } else {
+                    break;
+                }
+
+                // Vai para a proxima linha
+                line = buffer.readLine();
+                totalLinhas++;
+                System.out.println("Total de linhas lidas:" + totalLinhas);
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException | SQLException ex) {
+            Logger.getLogger(LeArquivo.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
             pstm.close();
         }
     }
@@ -132,9 +188,9 @@ public class LeArquivo {
 
         return total / array.length;
     }
-    
+
     private String formatDouble(double valor) {
-        
+
         return String.format("%.2f", valor);
     }
 

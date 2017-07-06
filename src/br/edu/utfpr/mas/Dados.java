@@ -4,15 +4,16 @@
  * and open the template in the editor.
  */
 package br.edu.utfpr.mas;
-import java.sql.*;
-import java.util.*;
+import java.sql.Time;
+import java.util.Date;
+
 /**
  *
  * @author Celso
  */
 public class Dados {
     private String servidor;
-    private java.sql.Date data;
+    private Date data;
     private Time tempo;
     private int ano;
     private int mes;
@@ -30,7 +31,7 @@ public class Dados {
     private int cacheMax;
     private int cacheMedia;
  
-    public Dados(String servidor, java.sql.Date data, Time tempo, int ano, int mes, int dia, int rMax, int rMedia, float cpuMax, float cpuMedia, int swpMax, int swpMedia, int freeMax, int freeMedia, int bffMax, int bffMedia, int cacheMax, int cacheMedia) {
+    public Dados(String servidor, Date data, Time tempo, int ano, int mes, int dia, int rMax, int rMedia, float cpuMax, float cpuMedia, int swpMax, int swpMedia, int freeMax, int freeMedia, int bffMax, int bffMedia, int cacheMax, int cacheMedia) {
 	this.servidor = servidor;
 	this.tempo=tempo;
 	this.data = data;
@@ -62,7 +63,7 @@ public class Dados {
      * @return the data
      */
     public java.sql.Date getData() {
-	return data;
+	return new java.sql.Date(data.getTime());
     }   
     /**
      * @return the tempo
